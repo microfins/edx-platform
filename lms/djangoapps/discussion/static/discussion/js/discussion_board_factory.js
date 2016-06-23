@@ -1,20 +1,27 @@
-;(function(define) {
+(function(define) {
     'use strict';
 
-    define(['jquery', 'backbone'],
-        function($, Backbone) {
+    define(
+        [
+            'jquery',
+            'backbone',
+            'discussion/js/discussion_router',
+            'common/js/discussion/views/new_post_view'
+        ],
+        function($, Backbone, DiscussionRouter, NewPostView) {
             return function(options) {
-                var $element = options.$el,
-                    userInfo = options.user_info,
+                var userInfo = options.user_info,
                     sortPreference = options.sort_preference,
                     threads = options.threads,
                     threadPages = options.thread_pages,
                     contentInfo = options.content_info,
                     user = new window.DiscussionUser(userInfo),
                     discussion,
-                    courseSettings;
+                    courseSettings,
+                    newPostView,
+                    router;
                 // TODO: Perhaps eliminate usage of global variables when possible
-                window.DiscussionUtil.loadRolesFromContainer();
+                window.DiscussionUtil.loadRoles(options.roles);
                 window.$$course_id = options.courseId;
                 window.courseName = options.course_name;
                 window.DiscussionUtil.setUser(user);
@@ -22,15 +29,24 @@
                 window.Content.loadContentInfos(contentInfo);
                 discussion = new window.Discussion(threads, {pages: threadPages, sort: sortPreference});
                 courseSettings = new window.DiscussionCourseSettings(options.course_settings);
-                // jshint nonew:false
-                new window.DiscussionRouter({
+
+                // Create the new post view
+                newPostView = new NewPostView({
+                    el: $('.new-post-article'),
+                    collection: discussion,
+                    course_settings: courseSettings,
+                    mode: 'tab'
+                });
+                newPostView.render();
+
+                // Set up the router to manage the page's history
+                router = new DiscussionRouter({
+                    courseId: options.courseId,
                     discussion: discussion,
-                    course_settings: courseSettings
+                    courseSettings: courseSettings,
+                    newPostView: newPostView
                 });
-                Backbone.history.start({
-                    pushState: true,
-                    root: '/courses/' + options.courseId + '/discussion/forum/'
-                });
+                router.start();
             };
         });
 }).call(this, define || RequireJS.define);
