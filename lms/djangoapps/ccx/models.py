@@ -7,7 +7,7 @@ from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.timezone import UTC
+from pytz import utc
 
 from lazy import lazy
 from openedx.core.lib.time_zone_utils import get_formatted_time_zone
@@ -73,16 +73,16 @@ class CustomCourseForEdX(models.Model):
 
     def has_started(self):
         """Return True if the CCX start date is in the past"""
-        return datetime.now(UTC()) > self.start
+        return datetime.now(utc) > self.start
 
     def has_ended(self):
         """Return True if the CCX due date is set and is in the past"""
         if self.due is None:
             return False
 
-        return datetime.now(UTC()) > self.due
+        return datetime.now(utc) > self.due
 
-    def start_datetime_text(self, time_zone=UTC, format_string="SHORT_DATE"):
+    def start_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """Returns the desired text representation of the CCX start datetime
 
         The returned value is in specified time zone, defaulted to UTC.
@@ -95,7 +95,7 @@ class CustomCourseForEdX(models.Model):
             value += get_formatted_time_zone(time_zone, **kwargs)
         return value
 
-    def end_datetime_text(self, time_zone=UTC, format_string="SHORT_DATE"):
+    def end_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """Returns the desired text representation of the CCX due datetime
 
         If the due date for the CCX is not set, the value returned is the empty

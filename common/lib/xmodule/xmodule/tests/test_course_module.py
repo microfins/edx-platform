@@ -1,25 +1,24 @@
 import unittest
 from datetime import datetime, timedelta
 
-from fs.memoryfs import MemoryFS
-
-from mock import Mock, patch
 import itertools
-
+from freezegun import freeze_time
+from fs.memoryfs import MemoryFS
+from mock import Mock, patch
+from pytz import timezone, utc
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from django.utils.timezone import UTC
 
 
 ORG = 'test_org'
 COURSE = 'test_course'
 
-NOW = datetime.strptime('2013-01-01T01:00:00', '%Y-%m-%dT%H:%M:00').replace(tzinfo=UTC())
+NOW = datetime.strptime('2013-01-01T01:00:00', '%Y-%m-%dT%H:%M:00').replace(tzinfo=utc)
 
-_TODAY = datetime.now(UTC())
+_TODAY = datetime.now(utc)
 _LAST_WEEK = _TODAY - timedelta(days=7)
 _NEXT_WEEK = _TODAY + timedelta(days=7)
 
@@ -28,7 +27,7 @@ class CourseFieldsTestCase(unittest.TestCase):
     def test_default_start_date(self):
         self.assertEqual(
             xmodule.course_module.CourseFields.start.default,
-            datetime(2030, 1, 1, tzinfo=UTC())
+            datetime(2030, 1, 1, tzinfo=utc)
         )
 
 
@@ -224,6 +223,28 @@ class IsNewCourseTestCase(unittest.TestCase):
             print "Checking start=%s advertised=%s" % (setting[0], setting[1])
             self.assertEqual(course.start_datetime_text("DATE_TIME"), setting[4])
 
+    @freeze_time("2015-11-01 08:59:00")
+    def test_start_date_time_zone_before(self):
+        """
+        Test the start datetime text for time zones before daylight savings switch
+        """
+        time_zone = timezone('America/Los_Angeles')
+        course = get_dummy_course("2015-11-01T08:59", "2015-11-01T08:59")
+
+        self.assertEqual(course.start_datetime_text(time_zone=time_zone), 'Nov 01, 2015')
+        self.assertEqual(course.start_datetime_text("DATE_TIME", time_zone), u'Nov 01, 2015 at 01:59 PDT')
+
+    @freeze_time("2015-11-01 09:00:00")
+    def test_start_date_time_zone_after(self):
+        """
+        Test the start datetime text for time zones after daylight savings switch
+        """
+        time_zone = timezone('America/Los_Angeles')
+        course = get_dummy_course("2015-11-01T09:00", "2015-11-01T09:00")
+
+        self.assertEqual(course.start_datetime_text(time_zone=time_zone), 'Nov 01, 2015')
+        self.assertEqual(course.start_datetime_text("DATE_TIME", time_zone), u'Nov 01, 2015 at 01:00 PST')
+
     def test_start_date_is_default(self):
         for s in self.start_advertised_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
@@ -276,6 +297,28 @@ class IsNewCourseTestCase(unittest.TestCase):
 
         course = get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
         self.assertEqual('Sep 04, 2014 at 12:00 UTC', course.end_datetime_text("DATE_TIME"))
+
+    @freeze_time("2015-11-01 08:59:00")
+    def test_end_date_time_zone_before(self):
+        """
+        Test the end datetime text for time zones before daylight savings switch
+        """
+        time_zone = timezone('America/Los_Angeles')
+        course = get_dummy_course("2015-11-01T08:59", end="2015-11-01T08:59")
+
+        self.assertEqual(course.end_datetime_text(time_zone=time_zone), 'Nov 01, 2015')
+        self.assertEqual(course.end_datetime_text("DATE_TIME", time_zone), u'Nov 01, 2015 at 01:59 PDT')
+
+    @freeze_time("2015-11-01 09:00:00")
+    def test_end_date_time_zone_after(self):
+        """
+        Test the end datetime text for time zones after daylight savings switch
+        """
+        time_zone = timezone('America/Los_Angeles')
+        course = get_dummy_course("2015-11-01T09:00", end="2015-11-01T09:00")
+
+        self.assertEqual(course.end_datetime_text(time_zone=time_zone), 'Nov 01, 2015')
+        self.assertEqual(course.end_datetime_text("DATE_TIME", time_zone), u'Nov 01, 2015 at 01:00 PST')
 
 
 class DiscussionTopicsTestCase(unittest.TestCase):

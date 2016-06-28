@@ -360,7 +360,7 @@ class CourseOverview(TimeStampedModel):
 
         return course_metadata_utils.course_starts_within(self.start, days)
 
-    def start_datetime_text(self, time_zone=utc, format_string="SHORT_DATE"):
+    def start_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """
         Returns the desired text corresponding to the course's start date and
         time in the specified time zone, or utc if no time zone given.
@@ -369,8 +369,8 @@ class CourseOverview(TimeStampedModel):
         return course_metadata_utils.course_start_datetime_text(
             self.start,
             self.advertised_start,
-            time_zone,
             format_string,
+            time_zone,
             ugettext,
             strftime_localized
         )
@@ -386,14 +386,14 @@ class CourseOverview(TimeStampedModel):
             self.advertised_start,
         )
 
-    def end_datetime_text(self, time_zone=utc, format_string="SHORT_DATE"):
+    def end_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """
         Returns the end date or datetime for the course formatted as a string.
         """
         return course_metadata_utils.course_end_datetime_text(
             self.end,
-            time_zone,
             format_string,
+            time_zone,
             strftime_localized
         )
 

@@ -9,6 +9,9 @@ from pytz import timezone, utc
 
 
 class TestTimeZoneUtils(TestCase):
+    """
+    Tests the time zone utilities
+    """
     def setUp(self):
         """
         Sets up user for testing with time zone utils.
@@ -32,18 +35,18 @@ class TestTimeZoneUtils(TestCase):
         user_tz = get_user_time_zone(self.user)
         self.assertEqual(user_tz, timezone('Asia/Tokyo'))
 
-    def _formatted_time_zone_helper(self, time_zone):
+    def _formatted_time_zone_helper(self, time_zone_string):
         """
         Helper function to return all info from get_formatted_time_zone()
         """
-        tz = timezone(time_zone)
-        tz_str = get_formatted_time_zone(tz)
+        time_zone = timezone(time_zone_string)
+        tz_str = get_formatted_time_zone(time_zone)
 
         kwargs = {'abbr': True}
-        tz_abbr = get_formatted_time_zone(tz, **kwargs)
+        tz_abbr = get_formatted_time_zone(time_zone, **kwargs)
 
         kwargs = {'offset': True}
-        tz_offset = get_formatted_time_zone(tz, **kwargs)
+        tz_offset = get_formatted_time_zone(time_zone, **kwargs)
 
         return {'str': tz_str, 'abbr': tz_abbr, 'offset': tz_offset}
 
@@ -54,7 +57,7 @@ class TestTimeZoneUtils(TestCase):
         self.assertEqual(formatted_tz_info['str'], '{name} ({abbr}, UTC{offset})'.format(name=expected_name,
                                                                                          abbr=expected_abbr,
                                                                                          offset=expected_offset)
-        )
+                         )
         self.assertEqual(formatted_tz_info['abbr'], expected_abbr)
         self.assertEqual(formatted_tz_info['offset'], expected_offset)
 

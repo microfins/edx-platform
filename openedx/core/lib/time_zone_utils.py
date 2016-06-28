@@ -11,9 +11,9 @@ def get_user_time_zone(user):
     Returns pytz time zone object of the user's time zone if available or UTC time zone if unavailable
     """
     #TODO: exception for unknown timezones?
-    tz = user.preferences.model.get_value(user, "time_zone")
-    if tz is not None:
-        return timezone(tz)
+    time_zone = user.preferences.model.get_value(user, "time_zone")
+    if time_zone is not None:
+        return timezone(time_zone)
     return utc
 
 
@@ -55,6 +55,7 @@ def get_formatted_time_zone(time_zone, **kwargs):
     return "{name} ({abbr}, UTC{offset})".format(name=time_zone, abbr=tz_abbr, offset=tz_offset).replace("_", " ")
 
 
-TIME_ZONE_CHOICES = [
-    (tz, get_formatted_time_zone(timezone(tz))) for tz in common_timezones
-]
+TIME_ZONE_CHOICES = sorted(
+    [(tz, get_formatted_time_zone(timezone(tz))) for tz in common_timezones],
+    key=lambda tz_tuple: tz_tuple[1]
+)

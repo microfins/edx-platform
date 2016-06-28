@@ -67,6 +67,7 @@ class DateSummary(object):
 
     @property
     def time_zone(self):
+        """The time zone to display in"""
         return get_user_time_zone(self.user)
 
     def __init__(self, course, user):

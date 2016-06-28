@@ -168,33 +168,33 @@ class CourseMetadataUtilsTestCase(TestCase):
                 # Test parsable advertised start date.
                 # Expect start datetime to be parsed and formatted back into a string.
                 TestScenario(
-                    (DEFAULT_START_DATE, advertised_start_parsable, utc, 'DATE_TIME', self.nop_gettext, self.mock_strftime_localized),
+                    (DEFAULT_START_DATE, advertised_start_parsable, 'DATE_TIME', utc, self.nop_gettext, self.mock_strftime_localized),
                     self.mock_strftime_localized(Date().from_json(advertised_start_parsable), 'DATE_TIME') + " UTC"
                 ),
                 # Test un-parsable advertised start date.
                 # Expect date parsing to throw a ValueError, and the advertised
                 # start to be returned in Title Case.
                 TestScenario(
-                    (test_datetime, advertised_start_unparsable, utc, 'DATE_TIME', self.nop_gettext, self.mock_strftime_localized),
+                    (test_datetime, advertised_start_unparsable, 'DATE_TIME', utc, self.nop_gettext, self.mock_strftime_localized),
                     advertised_start_unparsable.title()
                 ),
                 # Test parsable advertised start date from before January 1, 1900.
                 # Expect self.mock_strftime_localized to throw a ValueError, and the
                 # advertised start to be returned in Title Case.
                 TestScenario(
-                    (test_datetime, advertised_start_bad_date, utc, 'DATE_TIME', self.nop_gettext, self.mock_strftime_localized),
+                    (test_datetime, advertised_start_bad_date, 'DATE_TIME', utc, self.nop_gettext, self.mock_strftime_localized),
                     advertised_start_bad_date.title()
                 ),
                 # Test without advertised start date, but with a set start datetime.
                 # Expect formatted datetime to be returned.
                 TestScenario(
-                    (test_datetime, None, utc, 'SHORT_DATE', self.nop_gettext, self.mock_strftime_localized),
+                    (test_datetime, None, 'SHORT_DATE', utc, self.nop_gettext, self.mock_strftime_localized),
                     self.mock_strftime_localized(test_datetime, 'SHORT_DATE')
                 ),
                 # Test without advertised start date and with default start datetime.
                 # Expect TBD to be returned.
                 TestScenario(
-                    (DEFAULT_START_DATE, None, utc, 'SHORT_DATE', self.nop_gettext, self.mock_strftime_localized),
+                    (DEFAULT_START_DATE, None, 'SHORT_DATE', utc, self.nop_gettext, self.mock_strftime_localized),
                     'TBD'
                 )
             ]),
@@ -202,13 +202,13 @@ class CourseMetadataUtilsTestCase(TestCase):
                 # Test with a set end datetime.
                 # Expect formatted datetime to be returned.
                 TestScenario(
-                    (test_datetime, utc, 'TIME', self.mock_strftime_localized),
+                    (test_datetime, 'TIME', utc, self.mock_strftime_localized),
                     self.mock_strftime_localized(test_datetime, 'TIME') + " UTC"
                 ),
                 # Test with default end datetime.
                 # Expect empty string to be returned.
                 TestScenario(
-                    (None, utc, 'TIME', self.mock_strftime_localized),
+                    (None, 'TIME', utc, self.mock_strftime_localized),
                     ""
                 )
             ]),
@@ -241,11 +241,11 @@ class CourseMetadataUtilsTestCase(TestCase):
         time_zone_before_parsable = "2016-03-27 00:59:00"
         time_zone_before_datetime = datetime(2016, 03, 27, 00, 59, 00, tzinfo=utc)
 
-        actual_start_return = course_start_datetime_text(DEFAULT_START_DATE, time_zone_before_parsable, timezone('Europe/Paris'), 'DATE_TIME', self.nop_gettext, self.mock_strftime_localized)
+        actual_start_return = course_start_datetime_text(DEFAULT_START_DATE, time_zone_before_parsable, 'DATE_TIME', timezone('Europe/Paris'), self.nop_gettext, self.mock_strftime_localized)
         expected_start_return = "DATE_TIME " + "2016-03-27 01:59:00 CET"
         self.assertEqual(actual_start_return, expected_start_return)
 
-        actual_end_return = course_end_datetime_text(time_zone_before_datetime, timezone('Europe/Paris'), 'TIME', self.mock_strftime_localized)
+        actual_end_return = course_end_datetime_text(time_zone_before_datetime, 'TIME', timezone('Europe/Paris'), self.mock_strftime_localized)
         expected_end_return = "TIME " + "2016-03-27 01:59:00 CET"
         self.assertEqual(actual_end_return, expected_end_return)
 
@@ -258,10 +258,10 @@ class CourseMetadataUtilsTestCase(TestCase):
         time_zone_after_parsable = "2016-03-27 01:00:00"
         time_zone_after_datetime = datetime(2016, 03, 27, 01, 00, 00, tzinfo=utc)
 
-        actual_start_return = course_start_datetime_text(DEFAULT_START_DATE, time_zone_after_parsable, timezone('Europe/Paris'), 'DATE_TIME', self.nop_gettext, self.mock_strftime_localized)
+        actual_start_return = course_start_datetime_text(DEFAULT_START_DATE, time_zone_after_parsable, 'DATE_TIME', timezone('Europe/Paris'), self.nop_gettext, self.mock_strftime_localized)
         expected_start_return = "DATE_TIME " + "2016-03-27 03:00:00 CEST"
         self.assertEqual(actual_start_return, expected_start_return)
 
-        actual_end_return = course_end_datetime_text(time_zone_after_datetime, timezone('Europe/Paris'), 'TIME', self.mock_strftime_localized)
+        actual_end_return = course_end_datetime_text(time_zone_after_datetime, 'TIME', timezone('Europe/Paris'), self.mock_strftime_localized)
         expected_end_return = "TIME " + "2016-03-27 03:00:00 CEST"
         self.assertEqual(actual_end_return, expected_end_return)
