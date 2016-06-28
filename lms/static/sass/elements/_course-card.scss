@@ -55,16 +55,15 @@
     }
     .no-action-message{
       margin-bottom: $baseline/2;
-      color: palette(grayscale, black);
+      color: palette(grayscale, dark);
       font-size: font-size(large);
       text-align: center;
+      text-transform: uppercase;
+      margin-top: $baseline*2;
     }
     .enrollment-opens{
       text-align: center;
       margin-bottom: $baseline/2;
-    }
-    .enroll-open-date{
-      text-align: center;
     }
     .run-select-container{
       margin-bottom: $baseline;
