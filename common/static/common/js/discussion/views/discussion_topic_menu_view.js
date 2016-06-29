@@ -159,14 +159,14 @@
                     while (path.length > 1) {
                         path.shift();
                         partialName = ellipsisText + '/' + path.join('/');
-                        if (partialName.length > this.maxNameWidth) {
+                        if (partialName.length < this.maxNameWidth) {
                             return partialName;
                         }
                     }
                     rawName = path[0];
                     name = ellipsisText + ' / ' + rawName;
-                    while (name.length > this.maxNameWidth) {
-                      rawName = rawName.slice(0, this.maxNameWidth);
+                    if (name.length + 4 > this.maxNameWidth) {
+                      rawName = rawName.slice(0, this.maxNameWidth-4);
                       name = ellipsisText + ' / ' + rawName + ' ' + ellipsisText;
                     }
                 }

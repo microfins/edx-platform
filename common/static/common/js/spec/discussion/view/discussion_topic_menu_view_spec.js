@@ -34,7 +34,7 @@
                     'subcategories': {
                         'Basic Question Types': {
                             'subcategories': {},
-                            'children': ['Selection From Options', 'Numerical Input'],
+                            'children': ['Selection From Options', 'Numerical Input', 'Very long category name'],
                             'entries': {
                                 'Selection From Options': {
                                     'sort_key': null,
@@ -45,6 +45,11 @@
                                     'sort_key': null,
                                     'is_cohorted': false,
                                     'id': 'c49f0dfb8fc94c9c8d9999cc95190c56'
+                                },
+                                'Very long category name': {
+                                    'sort_key': null,
+                                    'is_cohorted': false,
+                                    'id': 'c49f0dfb8fc94c9c8d9999cc95190c59'
                                 }
                             }
                         }
@@ -66,6 +71,14 @@
           this.view.$el.find('a.topic-title').first().click();
           dropdownText = this.view.$el.find('.js-selected-topic').text();
           expect(this.completeText).toEqual(dropdownText);
+        });
+
+        it('truncation happens with specific title lengths', function() {
+            var dropdownText;
+            this.createTopicView();
+            this.view.$el.find('a.topic-title')[2].click();
+            dropdownText = this.view.$el.find('.js-selected-topic').text();
+            expect(dropdownText).toEqual('…/Very long category name');
         });
 
         it('broken span doesn\'t occur', function() {
