@@ -807,7 +807,7 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
 
         self.client.login(username=user.username, password='test')
         return self.client.get(
-            reverse(views.forum_form_discussion, args=[unicode(self.course.id)]),
+            reverse("discussion.views.forum_form_discussion", args=[unicode(self.course.id)]),
             data=request_data,
             **headers
         )
