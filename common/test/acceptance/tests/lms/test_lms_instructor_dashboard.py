@@ -95,8 +95,11 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         ])
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
+<<<<<<< Updated upstream
                 'button-name',  # TODO: AC-491
                 'list',  # TODO: AC-491,
+=======
+>>>>>>> Stashed changes
                 'color-contrast',  # TODO: AC-491
             ]
         })
