@@ -598,6 +598,20 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         self._course_run_cache = {}
         self.signal_handler = signal_handler
 
+    @property
+    def disabled_xblock_types(self):
+        """
+        Returns the list of disabled xblock types.
+        """
+        return self._disabled_xblock_types
+
+    @disabled_xblock_types.setter
+    def disabled_xblock_types(self, value):
+        """
+        Sets the list of disabled xblock types.
+        """
+        self._disabled_xblock_types = value
+
     def close_connections(self):
         """
         Closes any open connections to the underlying database

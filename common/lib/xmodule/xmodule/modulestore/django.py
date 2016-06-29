@@ -31,6 +31,9 @@ from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.util.django import get_current_request_hostname
 import xblock.reference.plugins
 
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+
 try:
     # We may not always have the request_cache module available
     from request_cache.middleware import RequestCache
@@ -50,8 +53,10 @@ except ImportError:
 
 try:
     from xblock_django.api import disabled_xblocks
+    from xblock_django.models import XBlockConfiguration
 except ImportError:
     disabled_xblocks = None
+    XBlockConfiguration = None
 
 log = logging.getLogger(__name__)
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
@@ -250,6 +255,18 @@ def clear_existing_modulestores():
     """
     global _MIXED_MODULESTORE  # pylint: disable=global-statement
     _MIXED_MODULESTORE = None
+
+
+if XBlockConfiguration and disabled_xblocks:
+    @receiver(post_save, sender=XBlockConfiguration)
+    def reset_disabled_xblocks(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-nam
+        """
+        If XBlockConfiguation and disabled_xblocks are available, register a signal handler
+        to update disabled_xblocks on model changes.
+        """
+
+        disabled_xblock_types = [block.name for block in disabled_xblocks()]
+        modulestore().disabled_xblock_types = disabled_xblock_types
 
 
 class ModuleI18nService(object):
