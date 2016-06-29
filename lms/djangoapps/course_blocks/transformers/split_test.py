@@ -1,10 +1,10 @@
 """
 Split Test Block Transformer
 """
-from openedx.core.lib.block_structure.transformer import OptimizedTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
 
 
-class SplitTestTransformer(OptimizedTransformer):
+class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """
     A nested transformer of the UserPartitionTransformer that honors the
     block structure pathways created by split_test modules.
@@ -75,7 +75,9 @@ class SplitTestTransformer(OptimizedTransformer):
 
         # The UserPartitionTransformer will enforce group access, so
         # go ahead and remove all extraneous split_test modules.
-        return block_structure.create_removal_filter(
-            lambda block_key: block_key.block_type == 'split_test',
-            keep_descendants=True,
-        )
+        return [
+            block_structure.create_removal_filter(
+                lambda block_key: block_key.block_type == 'split_test',
+                keep_descendants=True,
+            )
+        ]

@@ -9,7 +9,7 @@ from ..block_structure import BlockStructureModulestoreData
 from ..exceptions import TransformerException
 from ..transformers import BlockStructureTransformers
 from .helpers import (
-    ChildrenMapTestMixin, MockTransformer, MockOptimizedTransformer, mock_registered_transformers
+    ChildrenMapTestMixin, MockTransformer, MockFilteringTransformer, mock_registered_transformers
 )
 
 
@@ -27,7 +27,7 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
     def setUp(self):
         super(TestBlockStructureTransformers, self).setUp()
         self.transformers = BlockStructureTransformers(usage_info=MagicMock())
-        self.registered_transformers = [MockTransformer(), MockOptimizedTransformer()]
+        self.registered_transformers = [MockTransformer(), MockFilteringTransformer()]
 
     def add_mock_transformer(self):
         """
@@ -40,19 +40,19 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
         self.add_mock_transformer()
         self.assertIn(
             self.registered_transformers[0],
-            self.transformers._transformers['nonoptimized']  # pylint: disable=protected-access
+            self.transformers._transformers['no_filter']  # pylint: disable=protected-access
         )
         self.assertIn(
             self.registered_transformers[1],
-            self.transformers._transformers['optimized']  # pylint: disable=protected-access
+            self.transformers._transformers['supports_filter']  # pylint: disable=protected-access
         )
 
     def test_add_unregistered(self):
         with self.assertRaises(TransformerException):
             self.transformers += [self.UnregisteredTransformer()]
 
-        self.assertEquals(self.transformers._transformers['nonoptimized'], [])  # pylint: disable=protected-access
-        self.assertEquals(self.transformers._transformers['optimized'], [])  # pylint: disable=protected-access
+        self.assertEquals(self.transformers._transformers['no_filter'], [])  # pylint: disable=protected-access
+        self.assertEquals(self.transformers._transformers['supports_filter'], [])  # pylint: disable=protected-access
 
     def test_collect(self):
         with mock_registered_transformers(self.registered_transformers):

@@ -1,10 +1,10 @@
 """
 Visibility Transformer implementation.
 """
-from openedx.core.lib.block_structure.transformer import OptimizedTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
 
 
-class VisibilityTransformer(OptimizedTransformer):
+class VisibilityTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """
     A transformer that enforces the visible_to_staff_only field on
     blocks by removing blocks from the block structure for which the
@@ -70,8 +70,10 @@ class VisibilityTransformer(OptimizedTransformer):
     def transform_block_filter(self, usage_info, block_structure):
         # Users with staff access bypass the Visibility check.
         if usage_info.has_staff_access:
-            return block_structure.create_universal_filter()
+            return [block_structure.create_universal_filter()]
 
-        return block_structure.create_removal_filter(
-            lambda block_key: self.get_visible_to_staff_only(block_structure, block_key),
-        )
+        return [
+            block_structure.create_removal_filter(
+                lambda block_key: self.get_visible_to_staff_only(block_structure, block_key),
+            )
+        ]

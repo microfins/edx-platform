@@ -629,12 +629,12 @@ class BlockStructureBlockData(BlockStructure):
                 remove_block.
         """
         return partial(
-            self.block_exists_after_filter,
+            self.retain_or_remove,
             removal_condition=removal_condition,
             keep_descendants=keep_descendants,
         )
 
-    def block_exists_after_filter(self, block_key, removal_condition, keep_descendants=False):
+    def retain_or_remove(self, block_key, removal_condition, keep_descendants=False):
         """
         Removes the given block if it satisfies the removal_condition.
         Returns True if the block was retained, and False if the block
@@ -670,7 +670,7 @@ class BlockStructureBlockData(BlockStructure):
                 remove_block.
         """
         self.filter_topological_traversal(
-            filter_func=lambda block_key: self.block_exists_after_filter(
+            filter_func=lambda block_key: self.retain_or_remove(
                 block_key, removal_condition, keep_descendants
             )
         )

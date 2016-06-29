@@ -1,14 +1,14 @@
 """
 Start Date Transformer implementation.
 """
-from openedx.core.lib.block_structure.transformer import OptimizedTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
 from lms.djangoapps.courseware.access_utils import check_start_date
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 from .utils import get_field_on_block
 
 
-class StartDateTransformer(OptimizedTransformer):
+class StartDateTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """
     A transformer that enforces the 'start' and 'days_early_for_beta'
     fields on blocks by removing blocks from the block structure for
@@ -86,7 +86,7 @@ class StartDateTransformer(OptimizedTransformer):
     def transform_block_filter(self, usage_info, block_structure):
         # Users with staff access bypass the Start Date check.
         if usage_info.has_staff_access:
-            return block_structure.create_universal_filter()
+            return [block_structure.create_universal_filter()]
 
         removal_condition = lambda block_key: not check_start_date(
             usage_info.user,
@@ -94,4 +94,4 @@ class StartDateTransformer(OptimizedTransformer):
             self.get_merged_start_date(block_structure, block_key),
             usage_info.course_key,
         )
-        return block_structure.create_removal_filter(removal_condition)
+        return [block_structure.create_removal_filter(removal_condition)]

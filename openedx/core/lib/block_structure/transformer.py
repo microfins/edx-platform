@@ -129,21 +129,21 @@ class BlockStructureTransformer(object):
         raise NotImplementedError
 
 
-class OptimizedTransformer(BlockStructureTransformer):
+class FilteringTransformerMixin(BlockStructureTransformer):
     """
-    Transformers may optionally choose to subclass this class instead of the
-    base, if their transform logic can be broken apart into a lambda for
-    optimization of combined tree traversals.
+    Transformers may optionally choose to implement this mixin if their
+    transform logic can be broken apart into a lambda for optimization of
+    combined tree traversals.
 
-    For performance reasons, developers should try to subclass this
-    class instead of the above base class, whenever possible - since
-    with this alternative, traversal of the entire block structure happens
-    only once for all transformers that implement this form of transform.
+    For performance reasons, developers should try to implement this mixin
+    whenever possible - with this alternative, traversal of the entire block
+    structure happens only once for all transformers that implement
+    FilteringTransformerMixin.
     """
 
     def transform(self, usage_info, block_structure):
         """
-        This override of the abstract base method allows OptimizedTransformers
+        This override of the abstract base method allows FilteringTransformers
         to define transform_block_filter instead of transform.
         """
         block_structure.filter_topological_traversal(self.transform_block_filter(usage_info, block_structure))
@@ -153,8 +153,8 @@ class OptimizedTransformer(BlockStructureTransformer):
         """
         This is an alternative to the standard transform method.
 
-        Returns a filter function to be used to filter out any unwanted blocks
-        in the given block_structure.
+        Returns a list of filter functions to be used for filtering out
+        any unwanted blocks in the given block_structure.
 
         In addition to the commonly used methods listed above, the following
         methods are commonly used by implementations of transform_block_filter:

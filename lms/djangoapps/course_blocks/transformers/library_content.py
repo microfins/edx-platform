@@ -3,13 +3,13 @@ Content Library Transformer.
 """
 import json
 from courseware.models import StudentModule
-from openedx.core.lib.block_structure.transformer import OptimizedTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
 from xmodule.library_content_module import LibraryContentModule
 from xmodule.modulestore.django import modulestore
 from eventtracking import tracker
 
 
-class ContentLibraryTransformer(OptimizedTransformer):
+class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """
     A transformer that manipulates the block structure by removing all
     blocks within a library_content module to which a user should not
@@ -105,7 +105,7 @@ class ContentLibraryTransformer(OptimizedTransformer):
                 return False
             return True
 
-        return block_structure.create_removal_filter(check_child_removal)
+        return [block_structure.create_removal_filter(check_child_removal)]
 
     @classmethod
     def _get_student_module(cls, user, course_key, block_key):

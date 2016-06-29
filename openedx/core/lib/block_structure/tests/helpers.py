@@ -6,7 +6,7 @@ from mock import patch
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from ..block_structure import BlockStructureBlockData
-from ..transformer import BlockStructureTransformer, OptimizedTransformer
+from ..transformer import BlockStructureTransformer, FilteringTransformerMixin
 
 
 class MockXBlock(object):
@@ -147,9 +147,9 @@ class MockTransformer(BlockStructureTransformer):
         pass
 
 
-class MockOptimizedTransformer(OptimizedTransformer):
+class MockFilteringTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """
-    A mock OptimizedTransformer class.
+    A mock FilteringTransformerMixin class.
     """
     VERSION = 1
 

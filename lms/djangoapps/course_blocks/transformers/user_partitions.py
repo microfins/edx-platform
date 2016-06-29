@@ -1,13 +1,13 @@
 """
 User Partitions Transformer
 """
-from openedx.core.lib.block_structure.transformer import OptimizedTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
 
 from .split_test import SplitTestTransformer
 from .utils import get_field_on_block
 
 
-class UserPartitionTransformer(OptimizedTransformer):
+class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """
     A transformer that enforces the group access rules on course blocks,
     by honoring their user_partitions and group_access fields, and
@@ -69,7 +69,7 @@ class UserPartitionTransformer(OptimizedTransformer):
 
         user_partitions = block_structure.get_transformer_data(self, 'user_partitions')
         if not user_partitions:
-            return block_structure.create_universal_filter()
+            return [block_structure.create_universal_filter()]
 
         user_groups = _get_user_partition_groups(
             usage_info.course_key, user_partitions, usage_info.user
@@ -80,7 +80,8 @@ class UserPartitionTransformer(OptimizedTransformer):
             ).check_group_access(user_groups)
         )
 
-        return [split_test_filter, group_access_filter]
+        split_test_filter.append(group_access_filter)
+        return split_test_filter
 
 
 class _MergedGroupAccess(object):
