@@ -17,7 +17,7 @@ from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
 from xmodule.modulestore import InvalidLocationError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import AssetLocator
-from cache_toolbox.core import get_cached_content, set_cached_content
+from cache_toolbox.helpers import get_cached_content, set_cached_content
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import NotFoundError
 
@@ -26,7 +26,7 @@ from xmodule.exceptions import NotFoundError
 
 log = logging.getLogger(__name__)
 HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
-
+CONTENTSERVER_VERSION = 'alpha'
 
 class StaticContentServer(object):
     """
@@ -262,7 +262,7 @@ class StaticContentServer(object):
         """
 
         # See if we can load this item from cache.
-        content = get_cached_content(location)
+        content = get_cached_content(location, version=CONTENTSERVER_VERSION)
         if content is None:
             # Not in cache, so just try and load it from the asset manager.
             try:
@@ -275,7 +275,7 @@ class StaticContentServer(object):
             # buffering in memory when we're serving an actual request.
             if content.length is not None and content.length < 1048576:
                 content = content.copy_to_in_mem()
-                set_cached_content(content)
+                set_cached_content(content, version=CONTENTSERVER_VERSION)
 
         return content
 
